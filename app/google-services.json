@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "694513740726",
+    "project_id": "hijrah-8a868",
+    "storage_bucket": "hijrah-8a868.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:694513740726:android:0b0de0bee4575baeab2f17",
+        "android_client_info": {
+          "package_name": "com.zulfa.hijrah"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnTEvF9kQM0MrF_04MxT4DvuwK2mIeP18"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
