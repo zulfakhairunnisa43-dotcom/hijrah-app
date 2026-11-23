@@ -1,3 +1,28 @@
 <resources>
     <string name="app_name">Hijrah</string>
+
+    <string name="login_title">Masuk ke Hijrah</string>
+    <string name="register_title">Buat Akun</string>
+    <string name="hint_name">Nama lengkap</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Kata sandi</string>
+    <string name="hint_confirm_password">Ulangi kata sandi</string>
+    <string name="btn_login">Masuk</string>
+    <string name="btn_register">Daftar</string>
+    <string name="btn_logout">Keluar</string>
+    <string name="go_register">Belum punya akun? Daftar</string>
+    <string name="go_login">Sudah punya akun? Masuk</string>
+
+    <string name="err_name_empty">Nama tidak boleh kosong</string>
+    <string name="err_email_empty">Email tidak boleh kosong</string>
+    <string name="err_email_invalid">Format email tidak valid</string>
+    <string name="err_password_empty">Kata sandi tidak boleh kosong</string>
+    <string name="err_password_short">Kata sandi minimal 6 karakter</string>
+    <string name="err_password_mismatch">Kata sandi tidak sama</string>
+
+    <string name="err_wrong_credentials">Email atau kata sandi salah</string>
+    <string name="err_email_taken">Email sudah terdaftar</string>
+    <string name="err_network">Tidak ada koneksi internet. Coba lagi</string>
+    <string name="err_unknown">Terjadi kesalahan. Coba lagi</string>
+    <string name="register_success">Pendaftaran berhasil</string>
 </resources>
