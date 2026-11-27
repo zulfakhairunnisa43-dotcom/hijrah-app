@@ -10,19 +10,32 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
+import com.zulfa.hijrah.data.ApiClient
 import com.zulfa.hijrah.data.IbadahOptions
 import com.zulfa.hijrah.data.IbadahRecord
+import com.zulfa.hijrah.data.PrayerResponse
 import com.zulfa.hijrah.databinding.ActivityMainBinding
 import com.zulfa.hijrah.ui.auth.LoginActivity
 import com.zulfa.hijrah.ui.ibadah.DetailActivity
 import com.zulfa.hijrah.ui.ibadah.FormActivity
 import com.zulfa.hijrah.ui.ibadah.IbadahAdapter
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
+
+    companion object {
+        // Ganti sesuai kotamu kalau perlu (contoh: "Banda Aceh", "Medan")
+        private const val PRAYER_CITY = "Lhokseumawe"
+        private const val PRAYER_COUNTRY = "Indonesia"
+        private const val PRAYER_METHOD = 20 // 20 = Kemenag RI
+    }
 
     private lateinit var binding: ActivityMainBinding
     private val adapter = IbadahAdapter { record -> openDetail(record) }
     private var listener: ListenerRegistration? = null
+    private var prayerCall: Call<PrayerResponse>? = null
 
     // Semua data dari Firestore disimpan di sini, filter dijalankan di aplikasi
     private var allRecords: List<IbadahRecord> = emptyList()
@@ -49,7 +62,66 @@ class MainActivity : AppCompatActivity() {
             FirebaseAuth.getInstance().signOut()
             goToLogin()
         }
+        binding.prayerCard.btnRetry.setOnClickListener { loadPrayerTimes() }
+
+        loadPrayerTimes()
     }
+
+    // ---------- Jadwal salat (API) ----------
+
+    private fun loadPrayerTimes() {
+        val card = binding.prayerCard
+        card.progressPrayer.visibility = View.VISIBLE
+        card.tvPrayerError.visibility = View.GONE
+        card.btnRetry.visibility = View.GONE
+
+        val call = ApiClient.prayerApi.getTimings(PRAYER_CITY, PRAYER_COUNTRY, PRAYER_METHOD)
+        prayerCall = call
+        call.enqueue(object : Callback<PrayerResponse> {
+            override fun onResponse(call: Call<PrayerResponse>, response: Response<PrayerResponse>) {
+                card.progressPrayer.visibility = View.GONE
+                val data = response.body()?.data
+                val timings = data?.timings
+                if (!response.isSuccessful || timings == null) {
+                    showPrayerError()
+                    return
+                }
+
+                card.tvSubuh.text = cleanTime(timings.fajr)
+                card.tvZuhur.text = cleanTime(timings.dhuhr)
+                card.tvAsar.text = cleanTime(timings.asr)
+                card.tvMagrib.text = cleanTime(timings.maghrib)
+                card.tvIsya.text = cleanTime(timings.isha)
+
+                card.tvPrayerDate.text = "$PRAYER_CITY • ${data.date?.readable.orEmpty()}"
+                val hijri = data.date?.hijri
+                card.tvHijri.text =
+                    if (hijri != null) "${hijri.day} ${hijri.month?.en} ${hijri.year} H" else ""
+            }
+
+            override fun onFailure(call: Call<PrayerResponse>, t: Throwable) {
+                if (call.isCanceled) return // layar ditutup, abaikan
+                card.progressPrayer.visibility = View.GONE
+                showPrayerError()
+            }
+        })
+    }
+
+    // API kadang menambah zona waktu di belakang jam (misal "04:52 (WIB)"), ambil 5 karakter pertama
+    private fun cleanTime(value: String?): String =
+        value?.take(5) ?: getString(R.string.time_placeholder)
+
+    private fun showPrayerError() {
+        binding.prayerCard.tvPrayerError.visibility = View.VISIBLE
+        binding.prayerCard.btnRetry.visibility = View.VISIBLE
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        prayerCall?.cancel()
+    }
+
+    // ---------- Filter ----------
 
     private fun setupFilters() {
         val allJenis = getString(R.string.filter_all_jenis)
@@ -87,6 +159,8 @@ class MainActivity : AppCompatActivity() {
             else -> binding.tvEmpty.visibility = View.GONE
         }
     }
+
+    // ---------- Data Firestore ----------
 
     // Mulai mendengarkan data saat layar terlihat, berhenti saat tidak terlihat
     override fun onStart() {

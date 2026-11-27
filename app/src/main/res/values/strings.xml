@@ -74,5 +74,15 @@
     <string name="status_terlewat">Terlewat</string>
     <string name="status_qadha">Qadha</string>
 
+    <string name="prayer_title">Jadwal Salat Hari Ini</string>
+    <string name="prayer_subuh">Subuh</string>
+    <string name="prayer_zuhur">Zuhur</string>
+    <string name="prayer_asar">Asar</string>
+    <string name="prayer_magrib">Magrib</string>
+    <string name="prayer_isya">Isya</string>
+    <string name="time_placeholder">--:--</string>
+    <string name="err_prayer">Gagal memuat jadwal salat. Periksa koneksi internet</string>
+    <string name="btn_retry">Coba lagi</string>
+
 
 </resources>
