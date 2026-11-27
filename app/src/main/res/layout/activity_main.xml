@@ -57,6 +57,10 @@
         <include
             android:id="@+id/prayerCard"
             layout="@layout/view_prayer_card" />
+        <include
+            android:id="@+id/reminderRow"
+            layout="@layout/view_reminder_row" />
+
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"

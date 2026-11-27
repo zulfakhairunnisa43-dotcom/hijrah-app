@@ -84,5 +84,19 @@
     <string name="err_prayer">Gagal memuat jadwal salat. Periksa koneksi internet</string>
     <string name="btn_retry">Coba lagi</string>
 
+    <string name="reminder_label">Pengingat waktu salat</string>
+    <string name="btn_test_reminder">Uji</string>
+    <string name="reminder_on">Pengingat diaktifkan</string>
+    <string name="reminder_no_times">Pengingat aktif setelah jadwal salat berhasil dimuat</string>
+    <string name="err_notif_denied">Izin notifikasi ditolak. Pengingat tidak aktif</string>
+    <string name="test_need_enable">Aktifkan pengingat dulu</string>
+    <string name="test_scheduled">Notifikasi uji akan muncul dalam 10 detik</string>
+
+    <string name="channel_name">Pengingat Salat</string>
+    <string name="notif_title">Waktu salat %1$s</string>
+    <string name="notif_text">Sudah masuk waktu %1$s (%2$s). Jangan lupa catat ibadahmu.</string>
+    <string name="notif_test_title">Uji pengingat</string>
+    <string name="notif_test_text">Notifikasi berjalan dengan baik.</string>
+
 
 </resources>

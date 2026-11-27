@@ -1,10 +1,16 @@
 package com.zulfa.hijrah
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -14,7 +20,9 @@ import com.zulfa.hijrah.data.ApiClient
 import com.zulfa.hijrah.data.IbadahOptions
 import com.zulfa.hijrah.data.IbadahRecord
 import com.zulfa.hijrah.data.PrayerResponse
+import com.zulfa.hijrah.data.ReminderPrefs
 import com.zulfa.hijrah.databinding.ActivityMainBinding
+import com.zulfa.hijrah.notif.ReminderScheduler
 import com.zulfa.hijrah.ui.auth.LoginActivity
 import com.zulfa.hijrah.ui.ibadah.DetailActivity
 import com.zulfa.hijrah.ui.ibadah.FormActivity
@@ -42,6 +50,19 @@ class MainActivity : AppCompatActivity() {
     private var filterJenis = ""   // kosong = semua jenis
     private var filterStatus = ""  // kosong = semua status
 
+    // Hasil dialog izin notifikasi
+    private val notifPermission = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            enableReminder()
+        } else {
+            // Izin ditolak: aplikasi tetap jalan normal, hanya pengingat yang tidak aktif
+            binding.reminderRow.switchReminder.isChecked = false
+            Toast.makeText(this, R.string.err_notif_denied, Toast.LENGTH_LONG).show()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -54,17 +75,72 @@ class MainActivity : AppCompatActivity() {
         binding.rvIbadah.adapter = adapter
 
         setupFilters()
+        setupReminder()
 
         binding.fabAdd.setOnClickListener {
             startActivity(Intent(this, FormActivity::class.java))
         }
         binding.btnLogout.setOnClickListener {
+            // Pengingat terikat pada sesi login, jadi dimatikan saat keluar
+            ReminderScheduler.cancelAll(this)
+            ReminderPrefs.setEnabled(this, false)
             FirebaseAuth.getInstance().signOut()
             goToLogin()
         }
         binding.prayerCard.btnRetry.setOnClickListener { loadPrayerTimes() }
 
         loadPrayerTimes()
+    }
+
+    // ---------- Pengingat (notifikasi) ----------
+
+    private fun setupReminder() {
+        val row = binding.reminderRow
+        // Atur status awal SEBELUM listener dipasang supaya tidak memicu dialog izin
+        row.switchReminder.isChecked = ReminderPrefs.isEnabled(this)
+        row.switchReminder.setOnCheckedChangeListener { _, checked ->
+            if (checked) onReminderOn() else onReminderOff()
+        }
+        row.btnTestReminder.setOnClickListener {
+            if (!ReminderPrefs.isEnabled(this)) {
+                Toast.makeText(this, R.string.test_need_enable, Toast.LENGTH_SHORT).show()
+            } else {
+                ReminderScheduler.scheduleTest(this)
+                Toast.makeText(this, R.string.test_scheduled, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun hasNotifPermission(): Boolean =
+        Build.VERSION.SDK_INT < 33 ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_GRANTED
+
+    private fun onReminderOn() {
+        if (hasNotifPermission()) {
+            enableReminder()
+        } else {
+            notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    private fun onReminderOff() {
+        ReminderPrefs.setEnabled(this, false)
+        ReminderScheduler.cancelAll(this)
+    }
+
+    private fun enableReminder() {
+        ReminderPrefs.setEnabled(this, true)
+        ReminderScheduler.ensureChannel(this)
+
+        val times = ReminderPrefs.getTimes(this)
+        if (times.isEmpty()) {
+            // Jadwal belum pernah dimuat; alarm dipasang otomatis setelah API berhasil
+            Toast.makeText(this, R.string.reminder_no_times, Toast.LENGTH_LONG).show()
+        } else {
+            ReminderScheduler.scheduleAll(this, times)
+            Toast.makeText(this, R.string.reminder_on, Toast.LENGTH_SHORT).show()
+        }
     }
 
     // ---------- Jadwal salat (API) ----------
@@ -87,16 +163,26 @@ class MainActivity : AppCompatActivity() {
                     return
                 }
 
-                card.tvSubuh.text = cleanTime(timings.fajr)
-                card.tvZuhur.text = cleanTime(timings.dhuhr)
-                card.tvAsar.text = cleanTime(timings.asr)
-                card.tvMagrib.text = cleanTime(timings.maghrib)
-                card.tvIsya.text = cleanTime(timings.isha)
+                card.tvSubuh.text = displayTime(timings.fajr)
+                card.tvZuhur.text = displayTime(timings.dhuhr)
+                card.tvAsar.text = displayTime(timings.asr)
+                card.tvMagrib.text = displayTime(timings.maghrib)
+                card.tvIsya.text = displayTime(timings.isha)
 
                 card.tvPrayerDate.text = "$PRAYER_CITY • ${data.date?.readable.orEmpty()}"
                 val hijri = data.date?.hijri
                 card.tvHijri.text =
                     if (hijri != null) "${hijri.day} ${hijri.month?.en} ${hijri.year} H" else ""
+
+                // Simpan jam salat, lalu pasang alarm kalau pengingat sedang aktif
+                val times = mapOf(
+                    1 to timings.fajr, 2 to timings.dhuhr, 3 to timings.asr,
+                    4 to timings.maghrib, 5 to timings.isha
+                ).mapNotNull { (id, value) -> value?.take(5)?.let { id to it } }.toMap()
+                ReminderPrefs.saveTimes(this@MainActivity, times)
+                if (ReminderPrefs.isEnabled(this@MainActivity)) {
+                    ReminderScheduler.scheduleAll(this@MainActivity, times)
+                }
             }
 
             override fun onFailure(call: Call<PrayerResponse>, t: Throwable) {
@@ -108,7 +194,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // API kadang menambah zona waktu di belakang jam (misal "04:52 (WIB)"), ambil 5 karakter pertama
-    private fun cleanTime(value: String?): String =
+    private fun displayTime(value: String?): String =
         value?.take(5) ?: getString(R.string.time_placeholder)
 
     private fun showPrayerError() {
