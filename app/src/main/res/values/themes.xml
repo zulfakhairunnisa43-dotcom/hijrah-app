@@ -11,6 +11,8 @@
         <item name="colorOnSurface">@color/text_dark</item>
         <!-- ikon status bar putih supaya terbaca di atas header hijau -->
         <item name="android:windowLightStatusBar">false</item>
+        <item name="colorSecondaryContainer">@color/green_container</item>
+        <item name="colorOnSecondaryContainer">@color/green_dark</item>
     </style>
 
     <style name="Widget.Hijrah.TextInput" parent="Widget.Material3.TextInputLayout.OutlinedBox">

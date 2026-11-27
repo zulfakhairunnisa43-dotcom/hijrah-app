@@ -38,6 +38,10 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
+        <activity
+            android:name=".ui.ibadah.DetailActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

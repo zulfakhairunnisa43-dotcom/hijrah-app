@@ -48,5 +48,31 @@
     <string name="err_save">Gagal menyimpan. Coba lagi</string>
     <string name="save_success">Catatan tersimpan</string>
 
+    <string name="filter_jenis_hint">Filter jenis ibadah</string>
+    <string name="filter_all_jenis">Semua jenis</string>
+    <string name="filter_all">Semua</string>
+    <string name="empty_filter">Tidak ada catatan yang cocok dengan filter</string>
+
+    <string name="detail_title">Detail Ibadah</string>
+    <string name="label_status">Status</string>
+    <string name="label_tanggal">Tanggal</string>
+    <string name="label_catatan">Catatan</string>
+    <string name="no_note">Tidak ada catatan</string>
+    <string name="btn_edit">Ubah</string>
+    <string name="btn_delete">Hapus</string>
+    <string name="btn_back">Kembali</string>
+
+    <string name="form_edit_title">Ubah Catatan Ibadah</string>
+    <string name="update_success">Catatan diperbarui</string>
+
+    <string name="delete_title">Hapus catatan?</string>
+    <string name="delete_message">Catatan ini akan dihapus permanen.</string>
+    <string name="delete_success">Catatan dihapus</string>
+    <string name="err_delete">Gagal menghapus. Coba lagi</string>
+
+    <string name="status_selesai">Selesai</string>
+    <string name="status_terlewat">Terlewat</string>
+    <string name="status_qadha">Qadha</string>
+
 
 </resources>

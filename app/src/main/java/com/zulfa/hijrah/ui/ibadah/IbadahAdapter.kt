@@ -7,7 +7,6 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.zulfa.hijrah.R
 import com.zulfa.hijrah.data.IbadahOptions
 import com.zulfa.hijrah.data.IbadahRecord
 import com.zulfa.hijrah.databinding.ItemIbadahBinding
@@ -17,7 +16,9 @@ private object IbadahDiff : DiffUtil.ItemCallback<IbadahRecord>() {
     override fun areContentsTheSame(a: IbadahRecord, b: IbadahRecord) = a == b
 }
 
-class IbadahAdapter : ListAdapter<IbadahRecord, IbadahAdapter.ViewHolder>(IbadahDiff) {
+class IbadahAdapter(
+    private val onClick: (IbadahRecord) -> Unit
+) : ListAdapter<IbadahRecord, IbadahAdapter.ViewHolder>(IbadahDiff) {
 
     class ViewHolder(val binding: ItemIbadahBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -33,15 +34,13 @@ class IbadahAdapter : ListAdapter<IbadahRecord, IbadahAdapter.ViewHolder>(Ibadah
         holder.binding.tvJenis.text = item.jenis
         holder.binding.tvTanggal.text = IbadahOptions.formatTanggal(item.tanggal.toDate().time)
         holder.binding.tvStatus.text = item.status
-
-        val colorRes = when (item.status) {
-            "Selesai" -> R.color.green_primary
-            "Terlewat" -> R.color.error_red
-            else -> R.color.gold
-        }
-        holder.binding.tvStatus.setTextColor(ContextCompat.getColor(context, colorRes))
+        holder.binding.tvStatus.setTextColor(
+            ContextCompat.getColor(context, IbadahOptions.statusColorRes(item.status))
+        )
 
         holder.binding.tvCatatan.visibility = if (item.catatan.isBlank()) View.GONE else View.VISIBLE
         holder.binding.tvCatatan.text = item.catatan
+
+        holder.itemView.setOnClickListener { onClick(item) }
     }
 }
