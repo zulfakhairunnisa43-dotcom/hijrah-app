@@ -30,4 +30,23 @@
     <string name="login_subtitle">Catat ibadahmu, jaga istiqamah setiap hari</string>
     <string name="register_subtitle">Mulai perjalanan ibadahmu bersama Hijrah</string>
     <string name="main_placeholder">Fitur pelacak ibadah akan hadir di sini</string>
+
+    <string name="empty_list">Belum ada catatan ibadah.\nTekan Tambah untuk mulai mencatat.</string>
+    <string name="err_load">Gagal memuat data. Periksa koneksi internet</string>
+    <string name="btn_add">Tambah</string>
+
+    <string name="form_add_title">Tambah Catatan Ibadah</string>
+    <string name="hint_jenis">Jenis ibadah</string>
+    <string name="hint_tanggal">Tanggal</string>
+    <string name="hint_status">Status</string>
+    <string name="hint_catatan">Catatan (opsional)</string>
+    <string name="btn_save">Simpan</string>
+    <string name="btn_cancel">Batal</string>
+    <string name="pick_date">Pilih tanggal</string>
+    <string name="err_jenis_empty">Pilih jenis ibadah</string>
+    <string name="err_status_empty">Pilih status</string>
+    <string name="err_save">Gagal menyimpan. Coba lagi</string>
+    <string name="save_success">Catatan tersimpan</string>
+
+
 </resources>

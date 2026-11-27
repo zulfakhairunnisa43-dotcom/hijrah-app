@@ -33,6 +33,11 @@
             android:name=".MainActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ui.ibadah.FormActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
     </application>
 
 </manifest>
