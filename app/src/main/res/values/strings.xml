@@ -25,4 +25,9 @@
     <string name="err_network">Tidak ada koneksi internet. Coba lagi</string>
     <string name="err_unknown">Terjadi kesalahan. Coba lagi</string>
     <string name="register_success">Pendaftaran berhasil</string>
+
+    <string name="bismillah">بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</string>
+    <string name="login_subtitle">Catat ibadahmu, jaga istiqamah setiap hari</string>
+    <string name="register_subtitle">Mulai perjalanan ibadahmu bersama Hijrah</string>
+    <string name="main_placeholder">Fitur pelacak ibadah akan hadir di sini</string>
 </resources>
